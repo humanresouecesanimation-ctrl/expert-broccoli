@@ -1,0 +1,19 @@
+HOW TO CREATE FLUIDLAB-SETUP.EXE
+
+Required once:
+1. Visual Studio 2022 Community with "Desktop development with C++"
+2. Git for Windows
+3. NSIS from https://nsis.sourceforge.io/Download
+
+Then right-click build-installer.ps1 and select "Run with PowerShell".
+
+If Windows blocks the script, open PowerShell inside the FluidLab folder and run:
+
+  powershell -ExecutionPolicy Bypass -File .\build-installer.ps1
+
+The finished installer will be:
+
+  dist\FluidLab-Setup.exe
+
+Double-click that file to install FluidLab. The installer creates Desktop and
+Start Menu shortcuts and adds FluidLab to Windows Installed Apps for removal.
