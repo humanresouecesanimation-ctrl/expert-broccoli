@@ -1,0 +1,54 @@
+name: Build Windows Installer
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Install NSIS
+        shell: powershell
+        run: choco install nsis --yes --no-progress
+
+      - name: Configure FluidLab
+        shell: powershell
+        run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64
+
+      - name: Build FluidLab
+        shell: powershell
+        run: cmake --build build --config Release
+
+      - name: Stage application
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force -Path dist/app | Out-Null
+          Copy-Item build/Release/FluidLab.exe dist/app/FluidLab.exe
+          Get-ChildItem build/Release -Filter *.dll -ErrorAction SilentlyContinue | Copy-Item -Destination dist/app
+
+      - name: Create installer
+        shell: powershell
+        run: |
+          $nsis = "${env:ProgramFiles(x86)}\NSIS\makensis.exe"
+          if (-not (Test-Path $nsis)) { $nsis = "C:\Program Files\NSIS\makensis.exe" }
+          & $nsis installer/FluidLab.nsi
+          if (-not (Test-Path dist/FluidLab-Setup.exe)) { throw "Installer was not created" }
+
+      - name: Upload FluidLab installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: FluidLab-Windows-Installer
+          path: dist/FluidLab-Setup.exe
+          if-no-files-found: error
+          retention-days: 30
+
