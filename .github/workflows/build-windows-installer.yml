@@ -23,7 +23,7 @@ jobs:
 
       - name: Configure FluidLab
         shell: powershell
-        run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64
+        run: cmake -S . -B build -G "Visual Studio 18 2026" -A x64
 
       - name: Build FluidLab
         shell: powershell
@@ -51,4 +51,3 @@ jobs:
           path: dist/FluidLab-Setup.exe
           if-no-files-found: error
           retention-days: 30
-
